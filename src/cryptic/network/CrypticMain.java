@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Level;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import cryptic.network.cmdframework.CommandFramework;
 import cryptic.network.lib.References;
 import cryptic.network.util.JsonCache;
 
@@ -26,10 +28,12 @@ public class CrypticMain extends JavaPlugin
 	public static CrypticMain instance;
 	public static CrypticMain get()
 	{
+		Validate.notNull(instance);
 		return instance;
 	}
 	
 	public final CrypticLogger clogger = new CrypticLogger(this);
+	public CommandFramework cmdFramework;
 	
 	@Override public void onLoad()
 	{
@@ -62,6 +66,11 @@ public class CrypticMain extends JavaPlugin
 	{
 		try {
 			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("enabled"));
+			
+			cmdFramework = new CommandFramework(get());
+			cmdFramework.registerCommands(get());
+			cmdFramework.registerHelp();
+			
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
