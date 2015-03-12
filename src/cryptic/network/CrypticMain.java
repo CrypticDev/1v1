@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import cryptic.network.cmdframework.CommandFramework;
 import cryptic.network.lib.References;
+import cryptic.network.module.Registry;
 import cryptic.network.util.JsonCache;
 
 /**
@@ -25,7 +26,7 @@ import cryptic.network.util.JsonCache;
  */
 public class CrypticMain extends JavaPlugin
 {
-	public static CrypticMain instance;
+	private static CrypticMain instance;
 	public static CrypticMain get()
 	{
 		Validate.notNull(instance);
@@ -70,6 +71,8 @@ public class CrypticMain extends JavaPlugin
 			cmdFramework = new CommandFramework(get());
 			cmdFramework.registerCommands(get());
 			cmdFramework.registerHelp();
+			
+			Registry.registerEvents(get());
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

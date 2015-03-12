@@ -8,11 +8,11 @@ package cryptic.network.module;
  * @author 598Johnn897
  *
  */
-public abstract class Module  
+public abstract class Module implements IModule
 {
-	public Module()
+	public Module() throws ModuleException
 	{
-		
+		Registry.registerModule(this);
 	}
 	
 	public ModuleInfo getInfo() throws ModuleException

@@ -25,6 +25,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.SimplePluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import cryptic.network.module.Module;
 import cryptic.network.util.ClassEnumerator;
 
 /**
@@ -116,6 +117,46 @@ public class CommandFramework implements CommandExecutor {
 	}
 
 	public void registerCommands(Plugin plugin) {
+		Class<?>[] classes = ClassEnumerator.getInstance()
+				.getClassesFromThisJar(plugin);
+		if (classes == null || classes.length == 0) {
+			return;
+		}
+		for (Class<?> c : classes) {
+			try {
+				if (CommandListener.class.isAssignableFrom(c)
+						&& !c.isInterface() && !c.isEnum() && !c.isAnnotation()) {
+					if (JavaPlugin.class.isAssignableFrom(c)) {
+						if (plugin.getClass().equals(c)) {
+							plugin.getLogger().log(Level.INFO,
+									"Searching class: " + c.getSimpleName());
+							registerCommands(plugin);
+						}
+					} else {
+						plugin.getLogger().log(Level.INFO,
+								"Searching class: " + c.getSimpleName());
+						registerCommands(c.newInstance());
+					}
+				}
+			} catch (InstantiationException e) {
+				plugin.getLogger().log(
+						Level.INFO,
+						c.getSimpleName()
+								+ " does not use the default constructor");
+ 
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				plugin.getLogger().log(
+						Level.INFO,
+						c.getSimpleName()
+								+ " does not use the default constructor");
+ 
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void registerCommands(Module module) {
 		Class<?>[] classes = ClassEnumerator.getInstance()
 				.getClassesFromThisJar(plugin);
 		if (classes == null || classes.length == 0) {

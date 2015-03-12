@@ -1,26 +1,28 @@
 package cryptic.example.module;
 
 import cryptic.network.module.Module;
+import cryptic.network.module.ModuleException;
 
 public class ExampleModule extends Module {
 
-	public ExampleModule() {
+	public ExampleModule() throws ModuleException {
 		super();
 	}
-	
-	public void load()
-	{
+
+	@Override
+	public void load() {
 		
 	}
-	
-	public void enable()
-	{
+
+	@Override
+	public void enable() {
 		
 	}
-	
-	public void disable()
-	{
+
+	@Override
+	public void disable() {
 		
 	}
+
 
 }
