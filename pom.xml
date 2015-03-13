@@ -1,11 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  
-  <groupId>cryptic.network</groupId>
-  <artifactId>CrypticCore</artifactId>
-  <version>0.1</version>
-  <name>CrypticCore</name>
-  
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>cryptic.network</groupId>
+	<artifactId>CrypticCore</artifactId>
+	<version>0.1</version>
+	<name>CrypticCore</name>
+
 
 	<repositories>
 		<repository>
@@ -41,7 +42,7 @@
 			<version>1.14.4</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- Json -->
 		<dependency>
 			<groupId>org.json</groupId>
@@ -92,29 +93,28 @@
 					</execution>
 				</executions>
 			</plugin>
-							<plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <createDependencyReducedPom>false</createDependencyReducedPom>
-              <minimizeJar>true</minimizeJar>
-              <artifactSet>
-                  <includes>
-                      <include>mkremins:fanciful</include>
-                      <include>org.json:json</include>
-                  </includes>
-              </artifactSet>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<minimizeJar>true</minimizeJar>
+							<artifactSet>
+								<includes>
+									<include>org.json:json</include>
+								</includes>
+							</artifactSet>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -152,7 +152,7 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
-				
+
 			</plugins>
 		</pluginManagement>
 	</build>

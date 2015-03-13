@@ -17,6 +17,7 @@ import org.json.JSONObject;
 
 import cryptic.network.cmdframework.CommandFramework;
 import cryptic.network.lib.References;
+import cryptic.network.module.ModuleCore;
 import cryptic.network.module.Registry;
 import cryptic.network.util.JsonCache;
 
@@ -57,6 +58,12 @@ public class CrypticMain extends JavaPlugin
 		}
 		
 		try {
+			References.MODULE_DIRECTORY = References.WORKING_DIRECTORY + CRYPTIC_JSON.getString("module_directory");
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+		
+		try {
 			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("loading"));
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -73,6 +80,8 @@ public class CrypticMain extends JavaPlugin
 			cmdFramework.registerHelp();
 			
 			Registry.registerEvents(get());
+			
+			new ModuleCore().init();
 			
 		} catch (JSONException e) {
 			e.printStackTrace();

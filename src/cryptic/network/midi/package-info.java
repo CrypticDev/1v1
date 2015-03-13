@@ -5,4 +5,4 @@
  * @author 598Johnn897
  *
  */
-package cryptic.example.module;
+package cryptic.network.midi;
