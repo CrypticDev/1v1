@@ -158,7 +158,7 @@ public class CommandFramework implements CommandExecutor {
 	
 	public void registerCommands(Module module) {
 		Class<?>[] classes = ClassEnumerator.getInstance()
-				.getClassesFromThisJar(plugin);
+				.getClassesFromThisJar(module);
 		if (classes == null || classes.length == 0) {
 			return;
 		}

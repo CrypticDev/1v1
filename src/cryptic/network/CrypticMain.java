@@ -8,6 +8,7 @@ import static cryptic.network.lib.References.CRYPTIC_JSON;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.apache.commons.lang.Validate;
@@ -18,6 +19,7 @@ import org.json.JSONObject;
 import cryptic.network.cmdframework.CommandFramework;
 import cryptic.network.lib.References;
 import cryptic.network.module.ModuleCore;
+import cryptic.network.module.ModuleException;
 import cryptic.network.module.Registry;
 import cryptic.network.util.JsonCache;
 
@@ -37,9 +39,13 @@ public class CrypticMain extends JavaPlugin
 	public final CrypticLogger clogger = new CrypticLogger(this);
 	public CommandFramework cmdFramework;
 	
+	private int start, end;
+	
 	@Override public void onLoad()
 	{
 		instance = this;
+		start = (int) System.currentTimeMillis();
+
 		if (!this.getDataFolder().exists())
 		{
 			File dir = this.getDataFolder();
@@ -64,7 +70,9 @@ public class CrypticMain extends JavaPlugin
 		}
 		
 		try {
-			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("loading"));
+			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("loading"), new Object[] {
+				this.getDescription().getName(), 
+				this.getDescription().getVersion() });
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -72,9 +80,7 @@ public class CrypticMain extends JavaPlugin
 	
 	@Override public void onEnable()
 	{
-		try {
-			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("enabled"));
-			
+		try {			
 			cmdFramework = new CommandFramework(get());
 			cmdFramework.registerCommands(get());
 			cmdFramework.registerHelp();
@@ -83,16 +89,34 @@ public class CrypticMain extends JavaPlugin
 			
 			new ModuleCore().init();
 			
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			end = (int) (System.currentTimeMillis() - start);
+			try {
+				clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("enabled"), 
+						new Object[] {
+					this.getDescription().getName(), 
+					this.getDescription().getVersion(), end });
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+
 		}
 	}
 	
 	@Override public void onDisable()
 	{
 		try {
-			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("disabled"));
-		} catch (JSONException e) {
+			new ModuleCore().disable();
+			
+			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("disabled"), new Object[] {
+					this.getDescription().getName(), 
+					this.getDescription().getVersion(), 
+					TimeUnit.MILLISECONDS.toMinutes(
+							System.currentTimeMillis() - start) 				
+			} );
+		} catch (JSONException | ModuleException e) {
 			e.printStackTrace();
 		}
 	}
