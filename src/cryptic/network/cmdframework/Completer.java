@@ -1,4 +1,5 @@
 package cryptic.network.cmdframework;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,7 +16,8 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Completer {
+public @interface Completer
+{
 
 	/**
 	 * The command that this completer completes. If it is a sub command then
@@ -32,6 +34,7 @@ public @interface Completer {
 	 * 
 	 * @return
 	 */
-	String[] aliases() default {};
+	String[] aliases() default
+	{};
 
 }

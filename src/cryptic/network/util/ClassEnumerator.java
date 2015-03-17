@@ -1,4 +1,5 @@
 package cryptic.network.util;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -34,7 +35,7 @@ public class ClassEnumerator
 	public static ClassEnumerator getInstance()
 	{
 		if (instance == null)
-			;
+		;
 		{
 			instance = new ClassEnumerator();
 			return instance;
@@ -56,23 +57,28 @@ public class ClassEnumerator
 					{
 						classes.add(classLoader.loadClass(file.getName()
 								.replace(".class", "").replace("/", ".")));
-					} else if (file.getName().toLowerCase().trim()
+					}
+					else if (file.getName().toLowerCase().trim()
 							.endsWith(".jar"))
 					{
 						classes.addAll(getClassesFromJar(file, classLoader));
-					} else if (file.isDirectory())
+					}
+					else if (file.isDirectory())
 					{
 						classes.addAll(getClassesFromLocation(file));
 					}
-				} catch (MalformedURLException e)
+				}
+				catch (MalformedURLException e)
 				{
 					e.printStackTrace();
-				} catch (ClassNotFoundException e)
+				}
+				catch (ClassNotFoundException e)
 				{
 					e.printStackTrace();
 				}
 			}
-		} else
+		}
+		else
 		{
 			try
 			{
@@ -82,18 +88,22 @@ public class ClassEnumerator
 				{
 					classes.add(classLoader.loadClass(location.getName()
 							.replace(".class", "").replace("/", ".")));
-				} else if (location.getName().toLowerCase().trim()
+				}
+				else if (location.getName().toLowerCase().trim()
 						.endsWith(".jar"))
 				{
 					classes.addAll(getClassesFromJar(location, classLoader));
-				} else if (location.isDirectory())
+				}
+				else if (location.isDirectory())
 				{
 					classes.addAll(getClassesFromLocation(location));
 				}
-			} catch (MalformedURLException e)
+			}
+			catch (MalformedURLException e)
 			{
 				e.printStackTrace();
-			} catch (ClassNotFoundException e)
+			}
+			catch (ClassNotFoundException e)
 			{
 				e.printStackTrace();
 			}
@@ -113,25 +123,22 @@ public class ClassEnumerator
 					.getLocation().toURI();
 			classLoader = new URLClassLoader(new URL[]
 			{ uri.toURL() }, ClassEnumerator.class.getClassLoader());
-		} catch (URISyntaxException e)
-		{
-			e.printStackTrace();
-		} catch (MalformedURLException e)
+		}
+		catch (URISyntaxException e)
 		{
 			e.printStackTrace();
 		}
-		if (uri == null)
+		catch (MalformedURLException e)
 		{
-			throw new RuntimeException("No uri for "
-					+ this.getClass().getProtectionDomain().getCodeSource()
-							.getLocation());
+			e.printStackTrace();
 		}
-		if (classLoader == null)
-		{
-			throw new RuntimeException("No classLoader for "
-					+ this.getClass().getProtectionDomain().getCodeSource()
-							.getLocation());
-		}
+		if (uri == null) { throw new RuntimeException("No uri for "
+				+ this.getClass().getProtectionDomain().getCodeSource()
+						.getLocation()); }
+		if (classLoader == null) { throw new RuntimeException(
+				"No classLoader for "
+						+ this.getClass().getProtectionDomain().getCodeSource()
+								.getLocation()); }
 		File file = new File(uri);
 		classes.addAll(getClassesFromLocation(file));
 		return classes.toArray(new Class[classes.size()]);
@@ -157,10 +164,12 @@ public class ClassEnumerator
 						.replace(".class", "").replace("/", ".")));
 			}
 			jarFile.close();
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
-		} catch (ClassNotFoundException e)
+		}
+		catch (ClassNotFoundException e)
 		{
 			e.printStackTrace();
 		}

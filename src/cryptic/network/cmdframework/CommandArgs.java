@@ -1,4 +1,5 @@
 package cryptic.network.cmdframework;
+
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -10,23 +11,28 @@ import org.bukkit.entity.Player;
  * @author minnymin3
  * 
  */
-public class CommandArgs {
+public class CommandArgs
+{
 
 	private CommandSender sender;
 	private org.bukkit.command.Command command;
 	private String label;
 	private String[] args;
 
-	protected CommandArgs(CommandSender sender, org.bukkit.command.Command command, String label, String[] args,
-			int subCommand) {
+	protected CommandArgs(CommandSender sender,
+			org.bukkit.command.Command command, String label, String[] args,
+			int subCommand)
+	{
 		String[] modArgs = new String[args.length - subCommand];
-		for (int i = 0; i < args.length - subCommand; i++) {
+		for (int i = 0; i < args.length - subCommand; i++)
+		{
 			modArgs[i] = args[i + subCommand];
 		}
 
 		StringBuffer buffer = new StringBuffer();
 		buffer.append(label);
-		for (int x = 0; x < subCommand; x++) {
+		for (int x = 0; x < subCommand; x++)
+		{
 			buffer.append("." + args[x]);
 		}
 		String cmdLabel = buffer.toString();
@@ -41,7 +47,8 @@ public class CommandArgs {
 	 * 
 	 * @return
 	 */
-	public CommandSender getSender() {
+	public CommandSender getSender()
+	{
 		return sender;
 	}
 
@@ -50,7 +57,8 @@ public class CommandArgs {
 	 * 
 	 * @return
 	 */
-	public org.bukkit.command.Command getCommand() {
+	public org.bukkit.command.Command getCommand()
+	{
 		return command;
 	}
 
@@ -59,7 +67,8 @@ public class CommandArgs {
 	 * 
 	 * @return Something like 'test.subcommand'
 	 */
-	public String getLabel() {
+	public String getLabel()
+	{
 		return label;
 	}
 
@@ -70,35 +79,46 @@ public class CommandArgs {
 	 * 
 	 * @return
 	 */
-	public String[] getArgs() {
+	public String[] getArgs()
+	{
 		return args;
 	}
-	
+
 	/**
 	 * Gets the argument at the specified index
-	 * @param index The index to get
+	 * 
+	 * @param index
+	 *            The index to get
 	 * @return The string at the specified index
 	 */
-	public String getArgs(int index) {
+	public String getArgs(int index)
+	{
 		return args[index];
 	}
 
 	/**
 	 * Returns the length of the command arguments
+	 * 
 	 * @return int length of args
 	 */
-	public int length() {
+	public int length()
+	{
 		return args.length;
 	}
-	
-	public boolean isPlayer() {
+
+	public boolean isPlayer()
+	{
 		return sender instanceof Player;
 	}
 
-	public Player getPlayer() {
-		if (sender instanceof Player) {
+	public Player getPlayer()
+	{
+		if (sender instanceof Player)
+		{
 			return (Player) sender;
-		} else {
+		}
+		else
+		{
 			return null;
 		}
 	}

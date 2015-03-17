@@ -30,18 +30,20 @@ import cryptic.network.util.JsonCache;
 public class CrypticMain extends JavaPlugin
 {
 	private static CrypticMain instance;
+
 	public static CrypticMain get()
 	{
 		Validate.notNull(instance);
 		return instance;
 	}
-	
+
 	public final CrypticLogger clogger = new CrypticLogger(this);
 	public CommandFramework cmdFramework;
-	
+
 	private int start, end;
-	
-	@Override public void onLoad()
+
+	@Override
+	public void onLoad()
 	{
 		instance = this;
 		start = (int) System.currentTimeMillis();
@@ -51,72 +53,106 @@ public class CrypticMain extends JavaPlugin
 			File dir = this.getDataFolder();
 			dir.mkdir();
 		}
-		
-		try {
-			CRYPTIC_JSON = new JsonCache(new File(CrypticMain.get().getDataFolder().getAbsolutePath() + References.CRYPTIC_JSON_FILE), new URL(References.CRYPTIC_JSON_URL), 15).getJson();
-		} catch (IOException | JSONException e) {
+
+		try
+		{
+			CRYPTIC_JSON = new JsonCache(new File(CrypticMain.get()
+					.getDataFolder().getAbsolutePath()
+					+ References.CRYPTIC_JSON_FILE), new URL(
+					References.CRYPTIC_JSON_URL), 15).getJson();
+		}
+		catch (IOException | JSONException e)
+		{
 			e.printStackTrace();
-			try {
+			try
+			{
 				CRYPTIC_JSON = new JSONObject().put("error", e.toString());
-			} catch (JSONException e1) {
+			}
+			catch (JSONException e1)
+			{
 				e1.printStackTrace();
 			}
 		}
-		
-		try {
-			References.MODULE_DIRECTORY = References.WORKING_DIRECTORY + CRYPTIC_JSON.getString("module_directory");
-		} catch (JSONException e1) {
+
+		try
+		{
+			References.MODULE_DIRECTORY = References.WORKING_DIRECTORY
+					+ CRYPTIC_JSON.getString("module_directory");
+		}
+		catch (JSONException e1)
+		{
 			e1.printStackTrace();
 		}
-		
-		try {
-			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("loading"), new Object[] {
-				this.getDescription().getName(), 
-				this.getDescription().getVersion() });
-		} catch (JSONException e) {
+
+		try
+		{
+			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages")
+					.getString("loading"), new Object[]
+			{ this.getDescription().getName(),
+					this.getDescription().getVersion() });
+		}
+		catch (JSONException e)
+		{
 			e.printStackTrace();
 		}
 	}
-	
-	@Override public void onEnable()
+
+	@Override
+	public void onEnable()
 	{
-		try {			
+		try
+		{
 			cmdFramework = new CommandFramework(get());
 			cmdFramework.registerCommands(get());
 			cmdFramework.registerHelp();
-			
+
 			Registry.registerEvents(get());
-			
+
 			new ModuleCore().init();
-			
-		} catch (Exception e) {
+
+		}
+		catch (Exception e)
+		{
 			e.printStackTrace();
-		} finally {
+		}
+		finally
+		{
 			end = (int) (System.currentTimeMillis() - start);
-			try {
-				clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("enabled"), 
-						new Object[] {
-					this.getDescription().getName(), 
-					this.getDescription().getVersion(), end });
-			} catch (JSONException e) {
+			try
+			{
+				clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages")
+						.getString("enabled"), new Object[]
+				{ this.getDescription().getName(),
+						this.getDescription().getVersion(), end });
+			}
+			catch (JSONException e)
+			{
 				e.printStackTrace();
 			}
 
 		}
 	}
-	
-	@Override public void onDisable()
+
+	@Override
+	public void onDisable()
 	{
-		try {
+		try
+		{
 			new ModuleCore().disable();
-			
-			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages").getString("disabled"), new Object[] {
-					this.getDescription().getName(), 
-					this.getDescription().getVersion(), 
-					TimeUnit.MILLISECONDS.toMinutes(
-							System.currentTimeMillis() - start) 				
-			} );
-		} catch (JSONException | ModuleException e) {
+
+			clogger.log(
+					Level.INFO,
+					CRYPTIC_JSON.getJSONObject("messages")
+							.getString("disabled"),
+					new Object[]
+					{
+							this.getDescription().getName(),
+							this.getDescription().getVersion(),
+							TimeUnit.MILLISECONDS.toMinutes(System
+									.currentTimeMillis() - start) });
+		}
+		catch (JSONException | ModuleException e)
+		{
 			e.printStackTrace();
 		}
 	}

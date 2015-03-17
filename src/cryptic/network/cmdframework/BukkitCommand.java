@@ -1,4 +1,5 @@
 package cryptic.network.cmdframework;
+
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
@@ -16,7 +17,8 @@ import org.bukkit.plugin.Plugin;
  * @author minnymin3
  * 
  */
-public class BukkitCommand extends org.bukkit.command.Command {
+public class BukkitCommand extends org.bukkit.command.Command
+{
 
 	private final Plugin owningPlugin;
 	private CommandExecutor executor;
@@ -28,7 +30,8 @@ public class BukkitCommand extends org.bukkit.command.Command {
 	 * @param name
 	 * @param owner
 	 */
-	protected BukkitCommand(String label, CommandExecutor executor, Plugin owner) {
+	protected BukkitCommand(String label, CommandExecutor executor, Plugin owner)
+	{
 		super(label);
 		this.executor = executor;
 		this.owningPlugin = owner;
@@ -36,26 +39,32 @@ public class BukkitCommand extends org.bukkit.command.Command {
 	}
 
 	@Override
-	public boolean execute(CommandSender sender, String commandLabel, String[] args) {
+	public boolean execute(CommandSender sender, String commandLabel,
+			String[] args)
+	{
 		boolean success = false;
 
-		if (!owningPlugin.isEnabled()) {
-			return false;
-		}
+		if (!owningPlugin.isEnabled()) { return false; }
 
-		if (!testPermission(sender)) {
-			return true;
-		}
+		if (!testPermission(sender)) { return true; }
 
-		try {
+		try
+		{
 			success = executor.onCommand(sender, this, commandLabel, args);
-		} catch (Throwable ex) {
-			throw new CommandException("Unhandled exception executing command '" + commandLabel + "' in plugin "
-					+ owningPlugin.getDescription().getFullName(), ex);
+		}
+		catch (Throwable ex)
+		{
+			throw new CommandException(
+					"Unhandled exception executing command '" + commandLabel
+							+ "' in plugin "
+							+ owningPlugin.getDescription().getFullName(), ex);
 		}
 
-		if (!success && usageMessage.length() > 0) {
-			for (String line : usageMessage.replace("<command>", commandLabel).split("\n")) {
+		if (!success && usageMessage.length() > 0)
+		{
+			for (String line : usageMessage.replace("<command>", commandLabel)
+					.split("\n"))
+			{
 				sender.sendMessage(line);
 			}
 		}
@@ -64,24 +73,36 @@ public class BukkitCommand extends org.bukkit.command.Command {
 	}
 
 	@Override
-	public java.util.List<String> tabComplete(CommandSender sender, String alias, String[] args)
-			throws CommandException, IllegalArgumentException {
+	public java.util.List<String> tabComplete(CommandSender sender,
+			String alias, String[] args) throws CommandException,
+			IllegalArgumentException
+	{
 		Validate.notNull(sender, "Sender cannot be null");
 		Validate.notNull(args, "Arguments cannot be null");
 		Validate.notNull(alias, "Alias cannot be null");
 
 		List<String> completions = null;
-		try {
-			if (completer != null) {
-				completions = completer.onTabComplete(sender, this, alias, args);
+		try
+		{
+			if (completer != null)
+			{
+				completions = completer
+						.onTabComplete(sender, this, alias, args);
 			}
-			if (completions == null && executor instanceof TabCompleter) {
-				completions = ((TabCompleter) executor).onTabComplete(sender, this, alias, args);
+			if (completions == null && executor instanceof TabCompleter)
+			{
+				completions = ((TabCompleter) executor).onTabComplete(sender,
+						this, alias, args);
 			}
-		} catch (Throwable ex) {
+		}
+		catch (Throwable ex)
+		{
 			StringBuilder message = new StringBuilder();
-			message.append("Unhandled exception during tab completion for command '/").append(alias).append(' ');
-			for (String arg : args) {
+			message.append(
+					"Unhandled exception during tab completion for command '/")
+					.append(alias).append(' ');
+			for (String arg : args)
+			{
 				message.append(arg).append(' ');
 			}
 			message.deleteCharAt(message.length() - 1).append("' in plugin ")
@@ -89,9 +110,8 @@ public class BukkitCommand extends org.bukkit.command.Command {
 			throw new CommandException(message.toString(), ex);
 		}
 
-		if (completions == null) {
-			return super.tabComplete(sender, alias, args);
-		}
+		if (completions == null) { return super
+				.tabComplete(sender, alias, args); }
 		return completions;
 	}
 

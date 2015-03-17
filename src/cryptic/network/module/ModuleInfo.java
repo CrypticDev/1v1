@@ -15,20 +15,21 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface ModuleInfo {
+public @interface ModuleInfo
+{
 
 	String id();
-	
+
 	String name();
-	
+
 	String version();
-	
+
 	String author() default "";
-	
+
 	String[] authors() default "";
-	
+
 	String description() default "";
-	
+
 	String[] depend() default "";
-	
+
 }
