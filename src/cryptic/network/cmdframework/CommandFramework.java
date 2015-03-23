@@ -168,15 +168,15 @@ public class CommandFramework implements CommandExecutor
 					{
 						if (plugin.getClass().equals(c))
 						{
-							plugin.getLogger().log(Level.INFO,
-									"Searching class: " + c.getSimpleName());
+							//plugin.getLogger().log(Level.INFO,
+							//		"Searching class: " + c.getSimpleName());
 							registerCommands(plugin);
 						}
 					}
 					else
 					{
-						plugin.getLogger().log(Level.INFO,
-								"Searching class: " + c.getSimpleName());
+						//plugin.getLogger().log(Level.INFO,
+						//		"Searching class: " + c.getSimpleName());
 						registerCommands(c.newInstance());
 					}
 				}

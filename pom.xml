@@ -18,6 +18,18 @@
 			<id>bungee-repo</id>
 			<url>https://oss.sonatype.org/content/groups/public/</url>
 		</repository>
+
+		<repository>
+			<id>fanciful-mvn-repo</id>
+			<url>http://repo.franga2000.com/artifactory/public</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
+
+
+
 	</repositories>
 
 	<dependencies>
@@ -48,6 +60,12 @@
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20090211</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mkremins</groupId>
+			<artifactId>fanciful</artifactId>
+			<version>0.3.1</version>
 		</dependency>
 
 	</dependencies>
@@ -109,6 +127,7 @@
 							<artifactSet>
 								<includes>
 									<include>org.json:json</include>
+									<include>mkremins:fanciful</include>
 								</includes>
 							</artifactSet>
 						</configuration>

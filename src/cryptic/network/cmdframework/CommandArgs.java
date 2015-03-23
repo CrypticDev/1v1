@@ -122,5 +122,19 @@ public class CommandArgs
 			return null;
 		}
 	}
+	
+	public String getFinalArg(final int start)
+	{
+		final StringBuilder bldr = new StringBuilder();
+		for (int i = start; i < args.length; i++)
+		{
+			if (i != start)
+			{
+				bldr.append(" ");
+			}
+			bldr.append(args[i]);
+		}
+		return bldr.toString();
+	}
 
 }

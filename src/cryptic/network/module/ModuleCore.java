@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 
+import lombok.Getter;
 import cryptic.network.CrypticMain;
 import cryptic.network.lib.References;
 import cryptic.network.util.ClassEnumerator;
@@ -19,12 +20,12 @@ import cryptic.network.util.ClassEnumerator;
  */
 public class ModuleCore
 {
+	// DO NOT CHANGE UNLESS TOLD 
+	@Getter static String VERSION = "0.1-ALPHA";
+	
+	@Getter static List<Module> modules = new ArrayList<Module>();
 
-	List<Module> modules = new ArrayList<Module>();
-
-	List<Module> loaded_modules = new ArrayList<Module>();
-
-	List<Module> enabled_modules = new ArrayList<Module>();
+	List<Module> loaded_modules = new ArrayList<Module>(), enabled_modules = new ArrayList<Module>();
 
 	HashMap<String, Module> byId = new HashMap<String, Module>();
 	HashMap<String, ModuleInfo> infoById = new HashMap<String, ModuleInfo>();
@@ -59,6 +60,7 @@ public class ModuleCore
 
 	public void load() throws ModuleException
 	{
+		CrypticMain.get().clogger.log(Level.INFO, "Loading modules...");
 		for (Module module : modules)
 		{
 			loadModule(module);
@@ -67,6 +69,7 @@ public class ModuleCore
 
 	public void enable() throws ModuleException
 	{
+		CrypticMain.get().clogger.log(Level.INFO, "Enabling modules...");
 		for (Module module : loaded_modules)
 		{
 			enableModule(module);
@@ -75,10 +78,17 @@ public class ModuleCore
 
 	public void disable() throws ModuleException
 	{
+		CrypticMain.get().clogger.log(Level.INFO, "Disabling modules...");
 		for (Module module : enabled_modules)
 		{
 			disableModule(module);
 		}
+	}
+	
+	public void reload() throws ModuleException 
+	{
+		disable();
+		init();
 	}
 
 	public void loadModule(Module module) throws ModuleException
@@ -106,7 +116,7 @@ public class ModuleCore
 	{
 		try
 		{
-			module.load();
+			module.enable();
 		}
 		catch (Exception e)
 		{
@@ -117,7 +127,7 @@ public class ModuleCore
 		finally
 		{
 			CrypticMain.get().clogger.log(Level.INFO,
-					"Loaded module {0} v{1} id{2}!", new Object[]
+					"Enabled module {0} v{1} id{2}!", new Object[]
 					{ module.getInfo().name(), module.getInfo().version(),
 							module.getInfo().id() });
 		}
@@ -127,7 +137,7 @@ public class ModuleCore
 	{
 		try
 		{
-			module.load();
+			module.disable();
 		}
 		catch (Exception e)
 		{
@@ -138,10 +148,27 @@ public class ModuleCore
 		finally
 		{
 			CrypticMain.get().clogger.log(Level.INFO,
-					"Loaded module {0} v{1} id{2}!", new Object[]
+					"Disabled module {0} v{1} id{2}!", new Object[]
 					{ module.getInfo().name(), module.getInfo().version(),
 							module.getInfo().id() });
 		}
+	}
+	
+	public static ArrayList<String> getModuleNames() throws ModuleException
+	{
+		ArrayList<String> names = new ArrayList<String>();
+		for (Module module : modules)
+		{
+			try
+			{
+				names.add(module.getInfo().name());
+			}
+			catch (ModuleException e)
+			{
+				throw new ModuleException("An error has occurred while getting a modules information!");
+			}
+		}
+		return names;
 	}
 
 	private List<Module> getModuleClasses(File file) throws ModuleException
@@ -181,10 +208,10 @@ public class ModuleCore
 			}
 		}
 
-		CrypticMain.get().clogger.log(Level.INFO, "Loaded {0} modules!",
+		CrypticMain.get().clogger.log(Level.INFO, "Detected {0} modules!",
 				modules.size());
 
 		return modules;
 	}
-
+	
 }
