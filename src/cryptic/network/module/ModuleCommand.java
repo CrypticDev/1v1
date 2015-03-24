@@ -5,6 +5,8 @@ package cryptic.network.module;
 
 import static cryptic.network.CrypticMain.get;
 
+import java.util.logging.Level;
+
 import org.bukkit.ChatColor;
 
 import mkremins.fanciful.FancyMessage;
@@ -23,30 +25,29 @@ public class ModuleCommand implements CommandListener
 	{ "md" })
 	public void module(CommandArgs info)
 	{
-
 		CUtil.send(
 				info.getSender(),
-				"<green>Running <gold>%s <green>v<gold>%s <green>with <gold>%d <green>module%s loaded.",
+				"Running <green>%s <reset>v<green>%s <reset>with <green>%d <reset>module%s loaded.",
 				get().getDescription().getName(), get().getDescription()
 						.getVersion(), ModuleCore.getModules().size(),
 				ModuleCore.getModules().size() == 1 ? "" : "s");
 		CUtil.send(info.getSender(),
-				"<green>For more information about the modules do \"/module help\"!");
+				"For more information about the modules do \"<green>/module help<reset>\"!");
 	}
 
 	@Command(name = "module.help", permission = "cryptic.module.help")
 	public void modulehelp(CommandArgs info)
 	{
 		String[] msg = new String[]
-		{ "<gold>Module Core Commands:",
-				"/module help - Displays this message.",
-				"/module list - Lists the current running modules.",
-				"/module reload - Reloads the modules.",
-				"/module version - Shows the version for the module core.",
-				"/module info [id] - Shows the information about a certain module." };
+		{ "Module Core Commands:",
+				"/module help <green>- <reset>Displays this message.",
+				"/module list <green>- <reset>Lists the current running modules.",
+				"/module reload <green>- <reset>Reloads the modules.",
+				"/module version <green>- <reset>Shows the version for the module core.",
+				"/module info [id] <green>- <reset>Shows the information about a certain module." };
 
 		for (String line : msg)
-			CUtil.send(info.getSender(), "<green>" + line);
+			CUtil.send(info.getSender(), line);
 	}
 
 	@Command(name = "module.list", permission = "cryptic.module.list")
@@ -62,18 +63,17 @@ public class ModuleCommand implements CommandListener
 					.tooltip(
 							new String[]
 							{
-									"Name: " + module.getInfo().name(),
-									"ID: " + module.getInfo().id(),
-									"Version: " + module.getInfo().version(),
-									"Author: " + module.getInfo().author(),
-									"Description: "
-											+ module.getInfo().description(),
+									CUtil.f("Name: <green>%s", module.getInfo().name()),
+									CUtil.f("ID: <green>%s", module.getInfo().id()),
+									CUtil.f("Version: <green>%s", module.getInfo().version()),
+									CUtil.f("Author: <green>%s", module.getInfo().author()),
+									CUtil.f("Description: <green>%s", module.getInfo().description()),
 									"",
-									CUtil.format("<gray><italics>Click for more information"), })
+									CUtil.f("<gray><italics>Click for more information"), })
 					.command("/module info " + module.getInfo().id());
 			if (ModuleCore.getModules().size() > 1) msg.then(", ");
 		}
-
+		
 		msg.send(info.getSender());
 	}
 
@@ -98,6 +98,6 @@ public class ModuleCommand implements CommandListener
 	public void modulereload(CommandArgs info) throws ModuleException
 	{
 		new ModuleCore().reload();
-		CUtil.send(info.getSender(), "<green>Module Core was reloaded!");
+		CUtil.sendop(Level.INFO, info.getSender(), "<green>Module Core was reloaded!");
 	}
 }

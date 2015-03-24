@@ -3,11 +3,15 @@ package cryptic.network.util;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Player;
 
 /**
  * @author Richmond Steele
@@ -92,7 +96,7 @@ public class CUtil
 	 *            Objects to be formatted into the string
 	 * @return formatted and colorized String
 	 */
-	public static String format(String string, Object... objects)
+	public static String f(String string, Object... objects)
 	{
 		string = String.format(string, objects);
 		return formatColors(string);
@@ -101,7 +105,38 @@ public class CUtil
 	public static void send(CommandSender sender, String string,
 			Object... objects)
 	{
-		sender.sendMessage(format(string, objects));
+		sender.sendMessage(f(string, objects));
+	}
+
+	public static void sendop(Level level, CommandSender sender, String string,
+			Object... objects)
+	{
+		if (sender instanceof Player)
+		{
+			sender.sendMessage(f(string, objects));
+			
+			ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+			console.sendMessage(f("%s: %s", sender.getName(), f(string, objects)));
+
+			for (Player p : Bukkit.getOnlinePlayers())
+			{
+				if (p.equals((Player) sender)) continue;
+				if (p.isOp()) p.sendMessage(f(
+						"<gray><italics>[%s: %s<gray><italics>]",
+						sender.getName(), f(string, objects)));
+			}
+		}
+		else
+		{
+			ConsoleCommandSender console = Bukkit.getServer().getConsoleSender();
+			console.sendMessage(f("%s: %s", sender.getName(), f(string, objects)));
+			
+			for (Player p : Bukkit.getOnlinePlayers())
+				if (p.isOp()) p.sendMessage(f(
+						"<gray><italics>[%s: %s<gray><italics>]",
+						sender.getName(), f(string, objects)));
+		}
+
 	}
 
 	public static void addColor(String s, ChatColor color)

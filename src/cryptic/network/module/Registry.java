@@ -3,6 +3,7 @@
  */
 package cryptic.network.module;
 
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
 import cryptic.network.CrypticMain;
@@ -39,6 +40,28 @@ public class Registry
 							.getPluginManager()
 							.registerEvents((Listener) c.newInstance(),
 									CrypticMain.get());
+				}
+			}
+			catch (InstantiationException | IllegalAccessException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void unregisterEvents(Object clazz)
+	{
+		Class<?>[] classes = ClassEnumerator.getInstance()
+				.getClassesFromThisJar(clazz);
+		if (classes == null || classes.length == 0) return;
+		for (Class<?> c : classes)
+		{
+			try
+			{
+				if (Listener.class.isAssignableFrom(c) && !c.isInterface()
+						&& !c.isEnum() && !c.isAnnotation())
+				{
+					HandlerList.unregisterAll((Listener) c.newInstance());
 				}
 			}
 			catch (InstantiationException | IllegalAccessException e)

@@ -16,7 +16,7 @@ public abstract class Module
 
 	public Module() throws ModuleException
 	{
-		Registry.registerModule(this);
+		
 	}
 
 	public ModuleInfo getInfo() throws ModuleException

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 
 import lombok.Getter;
+import static cryptic.network.CrypticMain.get;
 import cryptic.network.CrypticMain;
 import cryptic.network.lib.References;
 import cryptic.network.util.ClassEnumerator;
@@ -20,12 +21,17 @@ import cryptic.network.util.ClassEnumerator;
  */
 public class ModuleCore
 {
-	// DO NOT CHANGE UNLESS TOLD 
-	@Getter static String VERSION = "0.1-ALPHA";
+	// DO NOT CHANGE UNLESS TOLD
+	@Getter 
+	static String VERSION = "0.1-ALPHA";
 	
-	@Getter static List<Module> modules = new ArrayList<Module>();
+	@Getter 
+	static List<Module> modules = new ArrayList<Module>();
 
-	List<Module> loaded_modules = new ArrayList<Module>(), enabled_modules = new ArrayList<Module>();
+
+	List<Module> found_modules = new ArrayList<Module>(),
+			loaded_modules = new ArrayList<Module>(),
+			enabled_modules = new ArrayList<Module>();			 
 
 	HashMap<String, Module> byId = new HashMap<String, Module>();
 	HashMap<String, ModuleInfo> infoById = new HashMap<String, ModuleInfo>();
@@ -38,51 +44,72 @@ public class ModuleCore
 
 	public void init() throws ModuleException
 	{
-		try
-		{
-			modules = this.getModuleClasses(new File(
-					References.MODULE_DIRECTORY));
-		}
-		catch (ModuleException e)
-		{
-			e.printStackTrace();
-		}
-
-		for (Module module : modules)
-		{
-			byId.put(module.getInfo().id(), module);
-		}
+		try { found_modules = this.searchForModules(new File(
+					References.MODULE_DIRECTORY)); }
+		catch (ModuleException e) { e.printStackTrace(); }
 
 		load();
-
 		enable();
 	}
 
 	public void load() throws ModuleException
 	{
-		CrypticMain.get().clogger.log(Level.INFO, "Loading modules...");
-		for (Module module : modules)
-		{
-			loadModule(module);
-		}
+		get().clogger.log(Level.INFO, "Loading modules...");
+		for (Module module : found_modules)
+			if (!loaded_modules.contains(module))
+			{
+				loadModule(module);
+				
+				if (!modules.contains(module))
+					modules.add(module);
+			}
+			else
+			{
+				get().clogger.log(Level.SEVERE,
+						"Duplicate instance of module id {0}", module.getInfo()
+								.id());
+				this.disableModule(module);
+			}
 	}
 
 	public void enable() throws ModuleException
 	{
-		CrypticMain.get().clogger.log(Level.INFO, "Enabling modules...");
-		for (Module module : loaded_modules)
-		{
-			enableModule(module);
+		get().clogger.log(Level.INFO, "Enabling modules...");
+		for (Module module : loaded_modules) {
+			if (!byId.containsKey(module.getInfo().id())) 
+			{ 
+				enableModule(module);
+				
+				byId.put(module.getInfo().id(), module);
+				infoById.put(module.getInfo().id(), module.getInfo());
+				
+				if (!modules.contains(module))
+					modules.add(module);
+			}
+			else 
+			{
+				get().clogger.log(Level.SEVERE,
+						"Duplicate instance of Module: {0}", module.getInfo().id());
+				this.disableModule(module);
+			}
 		}
 	}
 
 	public void disable() throws ModuleException
 	{
-		CrypticMain.get().clogger.log(Level.INFO, "Disabling modules...");
+		get().clogger.log(Level.INFO, "Disabling modules...");
 		for (Module module : enabled_modules)
-		{
 			disableModule(module);
-		}
+		
+		found_modules.clear();
+		loaded_modules.clear();
+		enabled_modules.clear();
+		
+		modules.clear();
+		
+		byId.clear();
+		infoById.clear();
+		
 	}
 	
 	public void reload() throws ModuleException 
@@ -91,7 +118,7 @@ public class ModuleCore
 		init();
 	}
 
-	public void loadModule(Module module) throws ModuleException
+	void loadModule(Module module) throws ModuleException
 	{
 		try
 		{
@@ -105,17 +132,20 @@ public class ModuleCore
 		}
 		finally
 		{
-			CrypticMain.get().clogger.log(Level.INFO,
+			loaded_modules.add(module);
+			get().clogger.log(Level.INFO,
 					"Loaded module {0} v{1} id{2}!", new Object[]
 					{ module.getInfo().name(), module.getInfo().version(),
 							module.getInfo().id() });
 		}
 	}
 
-	public void enableModule(Module module) throws ModuleException
+	void enableModule(Module module) throws ModuleException
 	{
 		try
 		{
+			Registry.registerModule(module);
+	
 			module.enable();
 		}
 		catch (Exception e)
@@ -126,18 +156,26 @@ public class ModuleCore
 		}
 		finally
 		{
-			CrypticMain.get().clogger.log(Level.INFO,
+			enabled_modules.add(module);
+			
+			get().clogger.log(Level.INFO,
 					"Enabled module {0} v{1} id{2}!", new Object[]
 					{ module.getInfo().name(), module.getInfo().version(),
 							module.getInfo().id() });
 		}
 	}
 
-	public void disableModule(Module module) throws ModuleException
+	void disableModule(Module module) throws ModuleException
 	{
 		try
 		{
 			module.disable();
+
+			Registry.unregisterEvents(module);
+			
+			if (found_modules.contains(module)) found_modules.remove(module);
+			if (loaded_modules.contains(module)) loaded_modules.remove(module);
+			// if (enabled_modules.contains(module)) enabled_modules.remove(module);
 		}
 		catch (Exception e)
 		{
@@ -147,7 +185,7 @@ public class ModuleCore
 		}
 		finally
 		{
-			CrypticMain.get().clogger.log(Level.INFO,
+			get().clogger.log(Level.INFO,
 					"Disabled module {0} v{1} id{2}!", new Object[]
 					{ module.getInfo().name(), module.getInfo().version(),
 							module.getInfo().id() });
@@ -171,7 +209,7 @@ public class ModuleCore
 		return names;
 	}
 
-	private List<Module> getModuleClasses(File file) throws ModuleException
+	private List<Module> searchForModules(File file) throws ModuleException
 	{
 		List<Module> modules = new ArrayList<Module>();
 
@@ -180,35 +218,23 @@ public class ModuleCore
 
 		if (classes == null || classes.size() == 0) throw new ModuleException(
 				"No modules found!");
-		else CrypticMain.get().clogger.log(Level.INFO,
+		else get().clogger.log(Level.INFO,
 				"Found {0} files... searching for modules...", classes.size());
 
 		for (Class<?> c : classes)
-		{
 			if (Module.class.isAssignableFrom(c) && !c.isInterface()
 					&& !c.isEnum() && !c.isAnnotation())
-			{
 				if (c.getAnnotation(ModuleInfo.class) != null)
-				{
 					try
-					{
-						modules.add((Module) c.newInstance());
-					}
+					{ modules.add((Module) c.newInstance()); }
 					catch (InstantiationException | IllegalAccessException e)
-					{
-						e.printStackTrace();
-					}
-				}
+					{ e.printStackTrace(); }
 				else
-				{
 					throw new ModuleException(
 							"Module class found but does not have ModuleInfo annotation!: "
 									+ c.getPackage());
-				}
-			}
-		}
 
-		CrypticMain.get().clogger.log(Level.INFO, "Detected {0} modules!",
+		get().clogger.log(Level.INFO, "Detected {0} modules!",
 				modules.size());
 
 		return modules;

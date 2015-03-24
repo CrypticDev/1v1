@@ -11,6 +11,8 @@ import java.net.URL;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import lombok.Getter;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONException;
@@ -38,8 +40,10 @@ public class CrypticMain extends JavaPlugin
 	}
 
 	public final CrypticLogger clogger = new CrypticLogger(this);
-	public CommandFramework cmdFramework;
+	@Getter public CommandFramework cmdFramework;
 
+	@Getter public ModuleCore moduleCore;
+	
 	private int start, end;
 
 	@Override
@@ -64,36 +68,23 @@ public class CrypticMain extends JavaPlugin
 		catch (IOException | JSONException e)
 		{
 			e.printStackTrace();
-			try
-			{
-				CRYPTIC_JSON = new JSONObject().put("error", e.toString());
-			}
-			catch (JSONException e1)
-			{
-				e1.printStackTrace();
-			}
+			try { CRYPTIC_JSON = new JSONObject().put("error", e.toString()); }
+			catch (JSONException e1) { e1.printStackTrace(); }
 		}
 
 		try
 		{
 			References.MODULE_DIRECTORY = References.WORKING_DIRECTORY
 					+ CRYPTIC_JSON.getString("module_directory");
-		}
-		catch (JSONException e1)
-		{
-			e1.printStackTrace();
-		}
-
-		try
-		{
+			
 			clogger.log(Level.INFO, CRYPTIC_JSON.getJSONObject("messages")
 					.getString("loading"), new Object[]
 			{ this.getDescription().getName(),
 					this.getDescription().getVersion() });
 		}
-		catch (JSONException e)
+		catch (JSONException e1)
 		{
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
 	}
 
@@ -108,8 +99,8 @@ public class CrypticMain extends JavaPlugin
 
 			Registry.registerEvents(get());
 
-			new ModuleCore().init();
-
+			moduleCore = new ModuleCore();
+			moduleCore.init();
 		}
 		catch (Exception e)
 		{
@@ -138,7 +129,7 @@ public class CrypticMain extends JavaPlugin
 	{
 		try
 		{
-			new ModuleCore().disable();
+			moduleCore.disable();
 
 			clogger.log(
 					Level.INFO,
