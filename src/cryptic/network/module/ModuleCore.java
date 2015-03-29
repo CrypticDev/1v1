@@ -3,6 +3,8 @@
  */
 package cryptic.network.module;
 
+import static cryptic.network.CrypticMain.get;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +12,6 @@ import java.util.List;
 import java.util.logging.Level;
 
 import lombok.Getter;
-import static cryptic.network.CrypticMain.get;
-import cryptic.network.CrypticMain;
 import cryptic.network.lib.References;
 import cryptic.network.util.ClassEnumerator;
 

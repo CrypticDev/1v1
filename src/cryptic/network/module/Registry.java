@@ -3,6 +3,8 @@
  */
 package cryptic.network.module;
 
+import java.util.ArrayList;
+
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 
@@ -15,7 +17,13 @@ import cryptic.network.util.ClassEnumerator;
  */
 public class Registry
 {
-
+	static ArrayList<Listener> listeners = new ArrayList<Listener>();
+	static Listener addListener(Listener listener)
+	{
+		listeners.add(listener);
+		return listener;
+	}
+	
 	public static void registerModule(Module module) throws ModuleException
 	{
 		registerEvents(module);
@@ -38,7 +46,7 @@ public class Registry
 							.get()
 							.getServer()
 							.getPluginManager()
-							.registerEvents((Listener) c.newInstance(),
+							.registerEvents(addListener((Listener) c.newInstance()),
 									CrypticMain.get());
 				}
 			}
@@ -51,6 +59,7 @@ public class Registry
 	
 	public static void unregisterEvents(Object clazz)
 	{
+		/*
 		Class<?>[] classes = ClassEnumerator.getInstance()
 				.getClassesFromThisJar(clazz);
 		if (classes == null || classes.length == 0) return;
@@ -69,5 +78,9 @@ public class Registry
 				e.printStackTrace();
 			}
 		}
+		*/
+		
+		for (Listener listener : listeners)
+			HandlerList.unregisterAll(listener);
 	}
 }
